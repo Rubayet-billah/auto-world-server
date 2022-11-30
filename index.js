@@ -12,7 +12,26 @@ app.use(express.json());
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.bhwsqpg.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-console.log(uri)
+const carsCollection = client.db("autoWorld").collection('cars');
+
+async function run() {
+    try {
+        app.get('/cars', async (req, res) => {
+            const query = {};
+            const cars = await carsCollection.find(query).toArray()
+            res.send(cars)
+        })
+        app.post('/cars', async (req, res) => {
+            const car = req.body;
+            const result = await carsCollection.insertOne(car);
+            res.send(result)
+        })
+    } catch (error) {
+
+    }
+}
+
+run().catch(err => console.error(err))
 
 
 app.get('/', (req, res) => {
